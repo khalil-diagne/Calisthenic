@@ -60,6 +60,7 @@ define('GEMINI_API_KEY', env_var('GEMINI_API_KEY', ''));
 // Configuration Site
 define('SITE_NAME', 'Calisthenics Senegal');
 define('SITE_URL', rtrim(env_var('SITE_URL', 'http://localhost/img/calis/'), '/') . '/');
+define('CSRF_TOKEN_KEY', '_calis_csrf_token');
 
 /**
  * Cible de redirection après login : chemins relatifs au dossier du site ou absolus sous SITE_URL.
@@ -115,6 +116,10 @@ function safe_redirect_target($raw) {
     return $out . $query . $frag;
 }
 
+function h($value) {
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+}
+
 // ==============================================
 // Initialiser les sessions
 // ==============================================
@@ -134,6 +139,53 @@ $_SESSION['last_activity'] = time();
 // ==============================================
 // Fonction de connexion à la base de données
 // ==============================================
+function get_csrf_token() {
+    if (empty($_SESSION[CSRF_TOKEN_KEY])) {
+        $_SESSION[CSRF_TOKEN_KEY] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION[CSRF_TOKEN_KEY];
+}
+
+function csrf_input() {
+    return '<input type="hidden" name="_csrf_token" value="' . h(get_csrf_token()) . '">';
+}
+
+function verify_csrf_token($token) {
+    if (!is_string($token) || empty($_SESSION[CSRF_TOKEN_KEY])) {
+        return false;
+    }
+
+    return hash_equals($_SESSION[CSRF_TOKEN_KEY], $token);
+}
+
+function require_valid_csrf() {
+    if (!verify_csrf_token($_POST['_csrf_token'] ?? '')) {
+        http_response_code(403);
+        set_flash_message('Session expirée ou requête invalide. Veuillez réessayer.', 'error');
+        $redirect = $_SERVER['REQUEST_URI'] ?? (SITE_URL . 'index.php');
+        header('Location: ' . $redirect);
+        exit;
+    }
+}
+
+function set_flash_message($text, $type = 'success') {
+    $_SESSION['flash_message'] = [
+        'type' => $type,
+        'text' => $text
+    ];
+}
+
+function get_flash_message() {
+    if (empty($_SESSION['flash_message']) || !is_array($_SESSION['flash_message'])) {
+        return null;
+    }
+
+    $message = $_SESSION['flash_message'];
+    unset($_SESSION['flash_message']);
+    return $message;
+}
+
 function connecter_db() {
     $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
     
@@ -188,6 +240,43 @@ function get_user_data($user_id) {
     $mysqli->close();
     
     return $user;
+}
+
+function fetch_lookup_options($tableName, $orderBy = 'nom ASC') {
+    $allowedTables = ['regions', 'niveaux'];
+    if (!in_array($tableName, $allowedTables, true)) {
+        return [];
+    }
+
+    $cacheKey = 'lookup_' . $tableName;
+    if (isset($_SESSION[$cacheKey]) && is_array($_SESSION[$cacheKey])) {
+        return $_SESSION[$cacheKey];
+    }
+
+    $mysqli = connecter_db();
+    $sql = "SELECT nom FROM {$tableName} ORDER BY {$orderBy}";
+    $result = $mysqli->query($sql);
+    $options = [];
+
+    if ($result !== false) {
+        while ($row = $result->fetch_assoc()) {
+            $options[] = $row['nom'];
+        }
+        $_SESSION[$cacheKey] = $options;
+    } else {
+        error_log('Erreur lookup ' . $tableName . ': ' . $mysqli->error);
+    }
+
+    $mysqli->close();
+    return $options;
+}
+
+function get_regions() {
+    return fetch_lookup_options('regions');
+}
+
+function get_niveaux() {
+    return fetch_lookup_options('niveaux', 'id ASC');
 }
 
 // ==============================================

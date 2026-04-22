@@ -2,29 +2,31 @@
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/auth.php';
 
-$error_message = '';
-$success_message = '';
+$flash = get_flash_message();
+$error_message = $flash && $flash['type'] === 'error' ? $flash['text'] : '';
+$success_message = $flash && $flash['type'] === 'success' ? $flash['text'] : '';
 
-// Process form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    require_valid_csrf();
+
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
-    
+
     if (empty($email)) {
         $error_message = "Veuillez entrer votre email";
     } elseif (empty($password)) {
         $error_message = "Veuillez entrer votre mot de passe";
     } else {
         $result = login_user($email, $password);
-        
+
         if ($result['success']) {
-            $success_message = $result['message'];
-            // Rediriger vers la page demandée ou dashboard (pas d’URL externe)
+            set_flash_message($result['message'], 'success');
             $redirect = safe_redirect_target($_GET['redirect'] ?? '');
-            header("refresh:1;url=" . $redirect);
-        } else {
-            $error_message = $result['message'];
+            header('Location: ' . $redirect);
+            exit;
         }
+
+        $error_message = $result['message'];
     }
 }
 ?>
@@ -167,20 +169,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       
       <?php if ($error_message): ?>
         <div class="message error-message">
-          ❌ <?php echo htmlspecialchars($error_message); ?>
+          ❌ <?php echo h($error_message); ?>
         </div>
       <?php endif; ?>
       
       <?php if ($success_message): ?>
         <div class="message success-message">
-          ✅ <?php echo htmlspecialchars($success_message); ?> Redirection...
+          ✅ <?php echo h($success_message); ?>
         </div>
       <?php endif; ?>
       
       <form method="POST" action="login.php" novalidate>
+        <?php echo csrf_input(); ?>
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="ton@email.com" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+          <input type="email" id="email" name="email" placeholder="ton@email.com" required value="<?php echo isset($_POST['email']) ? h($_POST['email']) : ''; ?>">
         </div>
         
         <div class="form-group">

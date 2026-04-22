@@ -4,11 +4,15 @@ require_once __DIR__ . '/includes/check_session.php';
 require_once __DIR__ . '/includes/auth.php';
 
 $user = $_SESSION['user_data'];
-$message = '';
-$error = '';
+$flash = get_flash_message();
+$message = $flash && $flash['type'] === 'success' ? $flash['text'] : '';
+$error = $flash && $flash['type'] === 'error' ? $flash['text'] : '';
+$regions = get_regions();
+$niveaux = get_niveaux();
 
 // Traiter les modifications du profil
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
+    require_valid_csrf();
     
     if ($_POST['action'] === 'update_profile') {
         $nom = trim($_POST['nom'] ?? '');
@@ -21,8 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
         } else {
             $result = update_profile($_SESSION['user_id'], $nom, $telephone, $region, $niveau);
             if ($result['success']) {
-                $message = $result['message'];
-                $user = $_SESSION['user_data'];
+                set_flash_message($result['message'], 'success');
+                header('Location: profile.php');
+                exit;
             } else {
                 $error = $result['message'];
             }
@@ -45,7 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
         } else {
             $result = change_password($_SESSION['user_id'], $old_pwd, $new_pwd);
             if ($result['success']) {
-                $message = $result['message'];
+                set_flash_message($result['message'], 'success');
+                header('Location: profile.php');
+                exit;
             } else {
                 $error = $result['message'];
             }
@@ -320,16 +327,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
       <!-- Sidebar -->
       <div class="profile-sidebar">
         <div class="profile-avatar"><?php echo strtoupper(substr($user['nom_complet'], 0, 1)) . strtoupper(substr(explode(' ', $user['nom_complet'])[1] ?? 'U', 0, 1)); ?></div>
-        <div class="profile-name"><?php echo htmlspecialchars($user['nom_complet']); ?></div>
+        <div class="profile-name"><?php echo h($user['nom_complet']); ?></div>
         
         <div class="profile-stats">
           <div class="stat">
             <div class="stat-label">Niveau</div>
-            <div class="stat-value"><?php echo htmlspecialchars($user['niveau']); ?></div>
+            <div class="stat-value"><?php echo h($user['niveau']); ?></div>
           </div>
           <div class="stat">
             <div class="stat-label">Région</div>
-            <div class="stat-value"><?php echo htmlspecialchars($user['region']); ?></div>
+            <div class="stat-value"><?php echo h($user['region']); ?></div>
           </div>
           <div class="stat">
             <div class="stat-label">Membre depuis</div>
@@ -389,23 +396,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
           <div class="card-title">Informations Personnelles</div>
           
           <form method="POST" action="profile.php">
+            <?php echo csrf_input(); ?>
             <input type="hidden" name="action" value="update_profile">
             
             <div class="form-row">
               <div class="form-group">
                 <label for="nom">Nom Complet</label>
-                <input type="text" id="nom" name="nom" value="<?php echo htmlspecialchars($user['nom_complet']); ?>" required>
+                <input type="text" id="nom" name="nom" value="<?php echo h($user['nom_complet']); ?>" required>
               </div>
               <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
+                <input type="email" id="email" value="<?php echo h($user['email']); ?>" disabled>
               </div>
             </div>
             
             <div class="form-row">
               <div class="form-group">
                 <label for="telephone">Téléphone</label>
-                <input type="tel" id="telephone" name="telephone" value="<?php echo htmlspecialchars($user['telephone'] ?? ''); ?>">
+                <input type="tel" id="telephone" name="telephone" value="<?php echo h($user['telephone'] ?? ''); ?>">
               </div>
               <div class="form-group">
                 <label for="region">Région</label>
@@ -447,6 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
           <div class="card-title">Sécurité</div>
           
           <form method="POST" action="profile.php">
+            <?php echo csrf_input(); ?>
             <input type="hidden" name="action" value="change_password">
             
             <div class="form-group">

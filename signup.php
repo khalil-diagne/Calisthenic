@@ -1,26 +1,23 @@
 <?php
-// ==============================================
-// Gestion de l'inscription utilisateur
-// Traitement direct du formulaire (sans JSON)
-// ==============================================
-
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/auth.php';
 
-$error_message = '';
-$success_message = '';
+$flash = get_flash_message();
+$error_message = $flash && $flash['type'] === 'error' ? $flash['text'] : '';
+$success_message = $flash && $flash['type'] === 'success' ? $flash['text'] : '';
+$regions = get_regions();
+$niveaux = get_niveaux();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    
-    // Récupérer et valider les données
+    require_valid_csrf();
+
     $nom = trim($_POST['nom'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $telephone = trim($_POST['telephone'] ?? '');
     $region = trim($_POST['region'] ?? '');
     $niveau = trim($_POST['niveau'] ?? '');
     $password = $_POST['password'] ?? '';
-    
-    // Validations
+
     if (empty($nom)) {
         $error_message = "Le nom est requis";
     } elseif (empty($email)) {
@@ -36,16 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (empty($niveau)) {
         $error_message = "Veuillez sélectionner un niveau";
     } else {
-        // Appeler la fonction d'enregistrement
         $result = register_user($nom, $email, $telephone, $region, $niveau, $password);
-        
+
         if ($result['success']) {
-            $success_message = "✅ Inscription réussie! Redirection...";
-            // Redirection après 2 secondes
-            header("refresh:2;url=index.php");
-        } else {
-            $error_message = $result['message'];
+            set_flash_message('Inscription réussie. Bienvenue dans la communauté !', 'success');
+            header('Location: index.php');
+            exit;
         }
+
+        $error_message = $result['message'];
     }
 }
 ?>
@@ -196,47 +192,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       
       <?php if ($error_message): ?>
         <div class="message error-message">
-          ❌ <?php echo htmlspecialchars($error_message); ?>
+          ❌ <?php echo h($error_message); ?>
         </div>
       <?php endif; ?>
       
       <?php if ($success_message): ?>
         <div class="message success-message">
-          ✅ <?php echo htmlspecialchars($success_message); ?>
+          ✅ <?php echo h($success_message); ?>
         </div>
       <?php endif; ?>
       
       <form method="POST" action="signup.php" novalidate>
+        <?php echo csrf_input(); ?>
         <div class="form-group">
           <label for="nom">Nom Complet</label>
-          <input type="text" id="nom" name="nom" placeholder="Ex: Ibrahima Diallo" required value="<?php echo isset($_POST['nom']) ? htmlspecialchars($_POST['nom']) : ''; ?>">
+          <input type="text" id="nom" name="nom" placeholder="Ex: Ibrahima Diallo" required value="<?php echo isset($_POST['nom']) ? h($_POST['nom']) : ''; ?>">
         </div>
         
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="ton@email.com" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+          <input type="email" id="email" name="email" placeholder="ton@email.com" required value="<?php echo isset($_POST['email']) ? h($_POST['email']) : ''; ?>">
         </div>
         
         <div class="form-group">
           <label for="telephone">Téléphone</label>
-          <input type="tel" id="telephone" name="telephone" placeholder="+221 77 123 45 67" value="<?php echo isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : ''; ?>">
+          <input type="tel" id="telephone" name="telephone" placeholder="+221 77 123 45 67" value="<?php echo isset($_POST['telephone']) ? h($_POST['telephone']) : ''; ?>">
         </div>
         
         <div class="form-group">
           <label for="region">Région</label>
           <select id="region" name="region" required>
             <option value="">-- Sélectionne ta région --</option>
-            <option value="Dakar" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Dakar') ? 'selected' : ''; ?>>Dakar</option>
-            <option value="Thiès" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Thiès') ? 'selected' : ''; ?>>Thiès</option>
-            <option value="Saint-Louis" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Saint-Louis') ? 'selected' : ''; ?>>Saint-Louis</option>
-            <option value="Kaolack" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Kaolack') ? 'selected' : ''; ?>>Kaolack</option>
-            <option value="Ziguinchor" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Ziguinchor') ? 'selected' : ''; ?>>Ziguinchor</option>
-            <option value="Tambacounda" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Tambacounda') ? 'selected' : ''; ?>>Tambacounda</option>
-            <option value="Kolda" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Kolda') ? 'selected' : ''; ?>>Kolda</option>
-            <option value="Matam" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Matam') ? 'selected' : ''; ?>>Matam</option>
-            <option value="Louga" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Louga') ? 'selected' : ''; ?>>Louga</option>
-            <option value="Fatick" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Fatick') ? 'selected' : ''; ?>>Fatick</option>
-            <option value="Autre" <?php echo (isset($_POST['region']) && $_POST['region'] === 'Autre') ? 'selected' : ''; ?>>Autre</option>
+            <?php foreach ($regions as $regionOption): ?>
+              <option value="<?php echo h($regionOption); ?>" <?php echo (isset($_POST['region']) && $_POST['region'] === $regionOption) ? 'selected' : ''; ?>>
+                <?php echo h($regionOption); ?>
+              </option>
+            <?php endforeach; ?>
           </select>
         </div>
         
@@ -244,11 +235,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <label for="niveau">Niveau d'expérience</label>
           <select id="niveau" name="niveau" required>
             <option value="">-- Ton niveau --</option>
-            <option value="Débutant" <?php echo (isset($_POST['niveau']) && $_POST['niveau'] === 'Débutant') ? 'selected' : ''; ?>>Débutant</option>
-            <option value="Intermédiaire" <?php echo (isset($_POST['niveau']) && $_POST['niveau'] === 'Intermédiaire') ? 'selected' : ''; ?>>Intermédiaire</option>
-            <option value="Avancé" <?php echo (isset($_POST['niveau']) && $_POST['niveau'] === 'Avancé') ? 'selected' : ''; ?>>Avancé</option>
-            <option value="Expert" <?php echo (isset($_POST['niveau']) && $_POST['niveau'] === 'Expert') ? 'selected' : ''; ?>>Expert</option>
-            <option value="Élite" <?php echo (isset($_POST['niveau']) && $_POST['niveau'] === 'Élite') ? 'selected' : ''; ?>>Élite</option>
+            <?php foreach ($niveaux as $niveauOption): ?>
+              <option value="<?php echo h($niveauOption); ?>" <?php echo (isset($_POST['niveau']) && $_POST['niveau'] === $niveauOption) ? 'selected' : ''; ?>>
+                <?php echo h($niveauOption); ?>
+              </option>
+            <?php endforeach; ?>
           </select>
         </div>
         

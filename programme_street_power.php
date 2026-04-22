@@ -13,6 +13,7 @@ if ($user_id && function_exists('get_specific_active_program')) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'start_program') {
+    require_valid_csrf();
     if (!$user_id) {
         header('Location: login.php');
         exit;
@@ -355,7 +356,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
   <?php if($error): ?>
     <div style="background:rgba(255,69,0,0.1); color:#ff6b6b; padding:1rem; border:1px solid rgba(255,69,0,0.3); margin-top:2rem;">
-      <?php echo htmlspecialchars($error); ?>
+      <?php echo h($error); ?>
     </div>
   <?php endif; ?>
 
@@ -364,6 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
       <a href="workout_session.php?prog=street-power" class="btn-start" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">✅ Reprendre l'entraînement</a>
     <?php else: ?>
       <form method="POST" style="flex:1; display:flex;">
+        <?php echo csrf_input(); ?>
         <input type="hidden" name="action" value="start_program">
         <button type="submit" class="btn-start">🚀 Démarrer le programme</button>
       </form>

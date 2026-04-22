@@ -20,8 +20,10 @@ if (!$prog_data) {
 }
 
 // Logique pour sauvegarder une séance
-$message = '';
+$flash = get_flash_message();
+$message = $flash && $flash['type'] === 'success' ? $flash['text'] : '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'log_workout') {
+    require_valid_csrf();
     $semaine = (int)$_POST['semaine'];
     $jour = (int)$_POST['jour'];
     $notes = trim($_POST['notes'] ?? '');
@@ -193,6 +195,7 @@ if ($niveau === 'Débutant') {
   </div>
   
   <form method="POST" class="finish-form">
+    <?php echo csrf_input(); ?>
     <h3>Fin de session</h3>
     <input type="hidden" name="action" value="log_workout">
     <input type="hidden" name="semaine" value="<?php echo $current_week; ?>">
