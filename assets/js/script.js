@@ -1,14 +1,18 @@
+
+
 // Custom cursor
 const cursor = document.getElementById('cursor');
 const trail = document.getElementById('cursorTrail');
 
 document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
-  setTimeout(() => {
-    trail.style.left = e.clientX + 'px';
-    trail.style.top = e.clientY + 'px';
-  }, 80);
+  if (cursor && trail) {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    setTimeout(() => {
+      trail.style.left = e.clientX + 'px';
+      trail.style.top = e.clientY + 'px';
+    }, 80);
+  }
 });
 
 // Scroll reveal

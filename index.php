@@ -15,6 +15,8 @@ require_once __DIR__ . '/includes/config.php';
 <div class="cursor" id="cursor"></div>
 <div class="cursor-trail" id="cursorTrail"></div>
 
+
+
 <!-- NAV -->
 <nav>
   <div class="nav-logo">
@@ -199,7 +201,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="exercise-card" data-cat="tirage">
       <div class="exercise-card-img-wrap">
         <div class="exercise-bg-pattern"></div>
-        <div class="exercise-card-img">🏋️</div>
+        <div class="exercise-card-img"><img src="assets/img/exercices/pull_up.png" alt="Pull-Up" class="exercise-real-img"></div>
         <span class="exercise-level level-debutant">Débutant</span>
         <div class="exercise-overlay">
           <h4>Étapes clés</h4>
@@ -225,7 +227,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="exercise-card" data-cat="poussee">
       <div class="exercise-card-img-wrap">
         <div class="exercise-bg-pattern"></div>
-        <div class="exercise-card-img">💪</div>
+        <div class="exercise-card-img"><img src="assets/img/exercices/dips.png" alt="Dips" class="exercise-real-img"></div>
         <span class="exercise-level level-debutant">Débutant</span>
         <div class="exercise-overlay">
           <h4>Étapes clés</h4>
@@ -251,7 +253,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="exercise-card" data-cat="core">
       <div class="exercise-card-img-wrap">
         <div class="exercise-bg-pattern"></div>
-        <div class="exercise-card-img">🔥</div>
+        <div class="exercise-card-img"><img src="assets/img/exercices/lsit.png" alt="L-Sit" class="exercise-real-img"></div>
         <span class="exercise-level level-intermediaire">Intermédiaire</span>
         <div class="exercise-overlay">
           <h4>Étapes clés</h4>
@@ -277,7 +279,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="exercise-card" data-cat="skills">
       <div class="exercise-card-img-wrap">
         <div class="exercise-bg-pattern"></div>
-        <div class="exercise-card-img">⭐</div>
+        <div class="exercise-card-img"><img src="assets/img/exercices/muscle_up.png" alt="Muscle-Up" class="exercise-real-img"></div>
         <span class="exercise-level level-avance">Avancé</span>
         <div class="exercise-overlay">
           <h4>Étapes clés</h4>
@@ -303,7 +305,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="exercise-card" data-cat="poussee">
       <div class="exercise-card-img-wrap">
         <div class="exercise-bg-pattern"></div>
-        <div class="exercise-card-img">🤸</div>
+        <div class="exercise-card-img"><img src="assets/img/exercices/hspu.png" alt="Handstand Push-Up" class="exercise-real-img"></div>
         <span class="exercise-level level-intermediaire">Intermédiaire</span>
         <div class="exercise-overlay">
           <h4>Étapes clés</h4>
@@ -329,7 +331,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="exercise-card" data-cat="skills">
       <div class="exercise-card-img-wrap">
         <div class="exercise-bg-pattern"></div>
-        <div class="exercise-card-img">🌟</div>
+        <div class="exercise-card-img"><img src="assets/img/exercices/front_lever.png" alt="Front Lever" class="exercise-real-img"></div>
         <span class="exercise-level level-elite">Élite</span>
         <div class="exercise-overlay">
           <h4>Étapes clés</h4>
@@ -355,7 +357,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="exercise-card" data-cat="core">
       <div class="exercise-card-img-wrap">
         <div class="exercise-bg-pattern"></div>
-        <div class="exercise-card-img">💥</div>
+        <div class="exercise-card-img"><img src="assets/img/exercices/dragon_flag.png" alt="Dragon Flag" class="exercise-real-img"></div>
         <span class="exercise-level level-debutant">Débutant</span>
         <div class="exercise-overlay">
           <h4>Étapes clés</h4>
@@ -381,7 +383,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="exercise-card" data-cat="tirage">
       <div class="exercise-card-img-wrap">
         <div class="exercise-bg-pattern"></div>
-        <div class="exercise-card-img">🦅</div>
+        <div class="exercise-card-img"><img src="assets/img/exercices/back_lever.png" alt="Back Lever" class="exercise-real-img"></div>
         <span class="exercise-level level-avance">Avancé</span>
         <div class="exercise-overlay">
           <h4>Étapes clés</h4>
@@ -550,30 +552,148 @@ require_once __DIR__ . '/includes/config.php';
   <div class="boutique-grid">
     <div class="product-card reveal">
       <div class="product-tag">Nouveau</div>
-      <div class="product-icon">🧤</div>
+      <div class="product-img-container"><img src="assets/img/boutique/gants.png" alt="Gants Pro Grip" class="product-real-img"></div>
       <h3 class="product-name">Gants Pro Grip</h3>
       <p class="product-desc">Protège tes mains lors des muscle-ups et tractions intensives. Adhérence maximale.</p>
       <div class="product-price">12 000 <span>FCFA</span></div>
-      <a href="#" class="btn-buy">Commander</a>
+      <button class="btn-buy" onclick="ouvrirCommande(this)">Commander</button>
     </div>
     <div class="product-card reveal">
       <div class="product-tag">Populaire</div>
-      <div class="product-icon">〰️</div>
+      <div class="product-img-container"><img src="assets/img/boutique/bandes.png" alt="Bandes Élastiques" class="product-real-img"></div>
       <h3 class="product-name">Bandes Élastiques</h3>
       <p class="product-desc">Pack de 3 résistances (Light, Medium, Heavy). Idéal pour débloquer le Front Lever.</p>
       <div class="product-price">15 000 <span>FCFA</span></div>
-      <a href="#" class="btn-buy">Commander</a>
+      <button class="btn-buy" onclick="ouvrirCommande(this)">Commander</button>
     </div>
     <div class="product-card reveal">
       <div class="product-tag">Premium</div>
-      <div class="product-icon">👕</div>
+      <div class="product-img-container"><img src="assets/img/boutique/tshirt.png" alt="T-Shirt Compression" class="product-real-img"></div>
       <h3 class="product-name">T-Shirt Compression</h3>
       <p class="product-desc">T-shirt respirant à effet seconde peau pour un maintien musculaire parfait lors de tes workouts.</p>
       <div class="product-price">18 000 <span>FCFA</span></div>
-      <a href="#" class="btn-buy">Commander</a>
+      <button class="btn-buy" onclick="ouvrirCommande(this)">Commander</button>
     </div>
   </div>
 </section>
+
+<!-- MODAL COMMANDE -->
+<div class="modal-commande" id="modalCommande">
+  <div class="modal-content">
+    <button class="modal-close" onclick="fermerCommande()">&times;</button>
+    
+    <!-- Si utilisateur non connecté -->
+    <div id="modalNotConnected" style="display:none;">
+      <h2 class="modal-title" style="color:var(--rouge);">CONNEXION REQUISE</h2>
+      <p class="modal-subtitle">Vous devez être connecté pour commander</p>
+      <p style="color:var(--gris-clair); margin-bottom:2rem;">Veuillez vous connecter ou créer un compte pour continuer.</p>
+      <div style="display:flex; gap:1rem;">
+        <a href="login.php" class="btn-primary" style="flex:1; text-align:center; text-decoration:none;">Se Connecter</a>
+        <a href="signup.php" class="btn-primary" style="flex:1; text-align:center; text-decoration:none; background:var(--vert);">S'Inscrire</a>
+      </div>
+    </div>
+    
+    <!-- Si utilisateur connecté -->
+    <div id="modalConnected" style="display:none;">
+      <h2 class="modal-title" id="modalProdNom">PRODUIT</h2>
+      <p class="modal-subtitle" id="modalProdPrix">0 FCFA</p>
+      
+      <form id="formCommande" onsubmit="envoyerCommande(event)">
+        <input type="hidden" id="inputProdNom" name="produit">
+        <input type="hidden" id="inputProdPrix" name="prix">
+        
+        <div class="form-group">
+          <label class="form-label">Nom Complet</label>
+          <input type="text" class="form-input" id="inputNom" name="nom" required readonly>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="inputEmail" name="email" required readonly>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Téléphone (WhatsApp)</label>
+          <input type="tel" class="form-input" id="inputTel" name="tel" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Adresse de livraison</label>
+          <input type="text" class="form-input" id="inputAdresse" name="adresse" required>
+        </div>
+        
+        <button type="submit" class="btn-submit">Confirmer la commande</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+const isUserConnected = <?php echo is_logged_in() ? 'true' : 'false'; ?>;
+const userData = <?php echo is_logged_in() ? json_encode(get_user_data(get_user_session())) : 'null'; ?>;
+
+function ouvrirCommande(btn) {
+  const card = btn.closest('.product-card');
+  const nom = card.querySelector('.product-name').innerText;
+  const prix = card.querySelector('.product-price').innerText;
+  
+  // Vérifier si l'utilisateur est connecté
+  if (!isUserConnected) {
+    document.getElementById('modalConnected').style.display = 'none';
+    document.getElementById('modalNotConnected').style.display = 'block';
+  } else {
+    // Préremplir les données utilisateur
+    document.getElementById('inputNom').value = userData.nom_complet || '';
+    document.getElementById('inputEmail').value = userData.email || '';
+    document.getElementById('inputTel').value = userData.telephone || '';
+    
+    document.getElementById('modalProdNom').innerText = nom;
+    document.getElementById('modalProdPrix').innerText = prix;
+    document.getElementById('inputProdNom').value = nom;
+    document.getElementById('inputProdPrix').value = prix;
+    
+    document.getElementById('modalNotConnected').style.display = 'none';
+    document.getElementById('modalConnected').style.display = 'block';
+  }
+  
+  document.getElementById('modalCommande').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function fermerCommande() {
+  document.getElementById('modalCommande').classList.remove('active');
+  document.body.style.overflow = 'auto';
+}
+
+function envoyerCommande(e) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+  
+  // Envoyer la commande à l'API PHP
+  fetch('api/commandes.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.success) {
+      alert('✅ Merci ' + data.nom + ' !\n\nVotre commande de ' + data.produit + ' a été enregistrée.\n\nNous vous contacterons sur WhatsApp au ' + data.tel + ' pour la livraison.\n\nN° Commande: #' + result.commande_id);
+      fermerCommande();
+      e.target.reset();
+    } else {
+      alert('❌ Erreur: ' + result.message);
+    }
+  })
+  .catch(error => {
+    console.error('Erreur:', error);
+    alert('❌ Une erreur est survenue. Veuillez réessayer.');
+  });
+}
+</script>
 
 <!-- COMMUNITY -->
 <section class="community" id="communaute">
